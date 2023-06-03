@@ -1,153 +1,169 @@
 <?php
-// Plugin Name: Woojoint
+/*
+Plugin Name: Woojoint
+Description: Connects WooCommerce to Webjoint using the Webjoint API
+Version: 1.0
+Author: Your Name Here
+*/
 
-// Define plugin directory path and uri
-define( 'WJ_DIRECTORY_PATH', plugin_dir_path( __FILE__ ) );
-define( 'WJ_DIRECTORY_URI', plugin_dir_url( __FILE__ ) );
+// Setup Webjoint API endpoint URL
+define( 'WEBJOINT_API_URL', 'https://app.webjoint.com/prod/api/' );
 
-// Add plugin scripts
-function cwpai_add_plugin_scripts() {
-    // Add JS script
-    wp_enqueue_script( 'woojoint-js', WJ_DIRECTORY_URI . 'js/woojoint.js', array( 'jquery' ), '1.0', true );
+// Add settings page to WordPress admin menu
+function cwpai_woojoint_add_settings_menu() {
+    add_options_page( 'Woojoint Settings', 'Woojoint', 'manage_options', 'woojoint-settings', 'cwpai_woojoint_settings_page' );
 }
-add_action( 'wp_enqueue_scripts', 'cwpai_add_plugin_scripts' );
+add_action( 'admin_menu', 'cwpai_woojoint_add_settings_menu' );
 
-// Add plugin settings page
-function cwpai_add_plugin_settings_page() {
-    add_menu_page(
-        'Woojoint Settings',
-        'Woojoint',
-        'manage_options',
-        'woojoint-settings',
-        'cwpai_render_settings_page'
-    );
-}
-add_action( 'admin_menu', 'cwpai_add_plugin_settings_page' );
+// Build the HTML for the settings page
+function cwpai_woojoint_settings_page() {
+    // Check if user is allowed to manage options
+    if( ! current_user_can( 'manage_options' ) ) {
+        wp_die( 'You do not have sufficient permissions to access this page.' );
+    }
 
-// Render plugin settings page
-function cwpai_render_settings_page() {
+    // Save settings if form has been submitted
+    if( isset( $_POST['woojoint_api_key'] ) ) {
+
+        // Sanitize inputs and save to options
+        update_option( 'woojoint_api_key', sanitize_text_field( $_POST['woojoint_api_key'] ) );
+        update_option( 'woojoint_facility_id', sanitize_text_field( $_POST['woojoint_facility_id'] ) );
+        update_option( 'woojoint_sync_interval', intval( $_POST['woojoint_sync_interval'] ) );
+
+        // Schedule the sync job based on the selected interval
+        $sync_interval = intval( $_POST['woojoint_sync_interval'] );
+        if( $sync_interval > 0 ) {
+            wp_schedule_event( time(), 'woojoint_sync', 'cwpai_woojoint_sync_data' );
+        }
+    }
+
+    // Load saved options
+    $api_key = get_option( 'woojoint_api_key', '' );
+    $facility_id = get_option( 'woojoint_facility_id', '' );
+    $sync_interval = get_option( 'woojoint_sync_interval', 0 );
+
+    // Render the settings page
     ?>
     <div class="wrap">
-        <h2>Woojoint Settings</h2>
-        <form method="post" action="options.php">
-            <?php settings_fields( 'woojoint-settings-group' ); ?>
-            <?php do_settings_sections( 'woojoint-settings-group' ); ?>
+        <h1>Woojoint settings</h1>
+        <form method="post">
             <table class="form-table">
-                <tr valign="top">
-                    <th scope="row">API Key</th>
-                    <td><input type="text" name="woojoint_api_key" value="<?php echo esc_attr( get_option( 'woojoint_api_key' ) ); ?>" /></td>
-                </tr>
-                <tr valign="top">
-                    <th scope="row">Facility ID</th>
-                    <td><input type="text" name="woojoint_facility_id" value="<?php echo esc_attr( get_option( 'woojoint_facility_id' ) ); ?>" /></td>
-                </tr>
-                <tr valign="top">
-                    <th scope="row">Sync Frequency</th>
-                    <td>
-                        <select name="woojoint_sync_frequency">
-                            <option value="1">Every minute</option>
-                            <option value="5">Every 5 minutes</option>
-                            <option value="10">Every 10 minutes</option>
-                            <option value="15">Every 15 minutes</option>
-                            <option value="20">Every 20 minutes</option>
-                            <option value="25">Every 25 minutes</option>
-                            <option value="30">Every 30 minutes</option>
-                            <option value="60">Hourly</option>
-                        </select>
-                    </td>
-                </tr>
+                <tbody>
+
+                    <!-- Facility ID input -->
+                    <tr>
+                        <th scope="row">
+                            <label for="woojoint_facility_id">Facility ID</label>
+                        </th>
+                        <td>
+                            <input id="woojoint_facility_id" type="text" name="woojoint_facility_id" value="<?php echo esc_attr( $facility_id ); ?>" required>
+                        </td>
+                    </tr>
+
+                    <!-- API Key input -->
+                    <tr>
+                        <th scope="row">
+                            <label for="woojoint_api_key">API Key</label>
+                        </th>
+                        <td>
+                            <input id="woojoint_api_key" type="text" name="woojoint_api_key" value="<?php echo esc_attr( $api_key ); ?>" required>
+                        </td>
+                    </tr>
+
+                    <!-- Sync interval input -->
+                    <tr>
+                        <th scope="row">
+                            <label for="woojoint_sync_interval">Sync Interval</label>
+                        </th>
+                        <td>
+                            <select id="woojoint_sync_interval" name="woojoint_sync_interval" required>
+                                <option value="0" <?php selected( $sync_interval, 0 ); ?>>Never</option>
+                                <option value="60" <?php selected( $sync_interval, 60 ); ?>>Every Minute</option>
+                                <option value="300" <?php selected( $sync_interval, 300 ); ?>>Every 5 minutes</option>
+                                <option value="600" <?php selected( $sync_interval, 600 ); ?>>Every 10 minutes</option>
+                                <option value="900" <?php selected( $sync_interval, 900 ); ?>>Every 15 minutes</option>
+                                <option value="1200" <?php selected( $sync_interval, 1200 ); ?>>Every 20 minutes</option>
+                                <option value="1500" <?php selected( $sync_interval, 1500 ); ?>>Every 25 minutes</option>
+                                <option value="1800" <?php selected( $sync_interval, 1800 ); ?>>Every 30 minutes</option>
+                                <option value="3600" <?php selected( $sync_interval, 3600 ); ?>>Hourly</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                </tbody>
             </table>
-            <?php submit_button(); ?>
+            <p><button class="button button-primary" type="submit">Save</button></p>
         </form>
-        <form method="post" action="<?php echo admin_url( 'admin-ajax.php' ); ?>">
-            <input type="hidden" name="action" value="woojoint_sync_data" />
-            <?php wp_nonce_field( 'woojoint_sync_data_nonce', 'security' ); ?>
-            <p><input type="submit" value="Sync Now" class="button button-primary"/></p>
+
+        <!-- Manual sync button -->
+        <form method="post">
+            <input type="hidden" name="woojoint_sync_now" value="true">
+            <p><button class="button" type="submit">Sync Now</button></p>
         </form>
     </div>
     <?php
 }
 
-// Register plugin settings
-function cwpai_register_plugin_settings() {
-    register_setting( 'woojoint-settings-group', 'woojoint_api_key' );
-    register_setting( 'woojoint-settings-group', 'woojoint_facility_id' );
-    register_setting( 'woojoint-settings-group', 'woojoint_sync_frequency' );
-}
-add_action( 'admin_init', 'cwpai_register_plugin_settings' );
+// Schedule data sync job based on selected interval
+function cwpai_woojoint_schedule_sync() {
+    // Load sync interval from options
+    $sync_interval = get_option( 'woojoint_sync_interval', 0 );
 
-// Sync data with WebJoint every X minutes
-function cwpai_sync_data_interval() {
-    // Get WebJoint API Key and Facility ID from options
-    $api_key = get_option( 'woojoint_api_key' );
-    $facility_id = get_option( 'woojoint_facility_id' );
-    
-    // Check if API Key and Facility ID are set
-    if ( $api_key && $facility_id ) {
-        // Sync Customers/Users
-        cwpai_sync_customers_users( $api_key, $facility_id );
-        // Sync Products
-        cwpai_sync_products( $api_key, $facility_id );
-        // Sync Orders
-        cwpai_sync_orders( $api_key, $facility_id );
-        // Sync Cart Information
-        cwpai_sync_cart_information( $api_key, $facility_id );
+    // Only schedule job if interval is defined
+    if( $sync_interval > 0 ) {
+        $frequency = "woojoint_sync";
+        wp_schedule_event( time(), $frequency, 'cwpai_woojoint_sync_data' );
     }
+
 }
-// Schedule cron job to sync data with WebJoint
-$sync_frequency = get_option( 'woojoint_sync_frequency' );
-if ( $sync_frequency ) {
-    $sync_frequency_in_seconds = $sync_frequency * 60;
-    wp_schedule_event( time(), $sync_frequency_in_seconds, 'cwpai_sync_data_interval' );
+add_action( 'init', 'cwpai_woojoint_schedule_sync' );
+
+// Setup data sync cron job
+function cwpai_woojoint_sync_data() {
+    // Get API Key and Facility ID from options
+    $api_key = get_option( 'woojoint_api_key', '' );
+    $facility_id = get_option( 'woojoint_facility_id', '' );
+
+    // Sync customers
+    // TODO: Implement
+
+    // Sync products
+    // TODO: Implement
+
+    // Sync orders
+    // TODO: Implement
+
+    // Sync cart information
+    // TODO: Implement
 }
 
-// Sync data with WebJoint manually
-function cwpai_sync_data_manual() {
-    // Check if nonce is set
-    if ( isset( $_REQUEST['security'] ) && wp_verify_nonce( $_REQUEST['security'], 'woojoint_sync_data_nonce' ) ) {
-        // Get WebJoint API Key and Facility ID from options
-        $api_key = get_option( 'woojoint_api_key' );
-        $facility_id = get_option( 'woojoint_facility_id' );
-    
-        // Check if API Key and Facility ID are set
-        if ( $api_key && $facility_id ) {
-            // Sync Customers/Users
-            cwpai_sync_customers_users( $api_key, $facility_id );
-            // Sync Products
-            cwpai_sync_products( $api_key, $facility_id );
-            // Sync Orders
-            cwpai_sync_orders( $api_key, $facility_id );
-            // Sync Cart Information
-            cwpai_sync_cart_information( $api_key, $facility_id );
-        }
+// Register shortcode for fetching data from Webjoint
+function cwpai_woojoint_shortcode( $atts ) {
+    // Get API Key and Facility ID from options
+    $api_key = get_option( 'woojoint_api_key', '' );
+    $facility_id = get_option( 'woojoint_facility_id', '' );
+
+    // Default output
+    $output = '<p>No data found.</p>';
+
+    // Check if an endpoint type was specified
+    if( isset( $atts['type'] ) ) {
+        $endpoint = $atts['type'];
+        // TODO: Implement fetching data from specified endpoint
     }
-}
-add_action( 'wp_ajax_woojoint_sync_data', 'cwpai_sync_data_manual' );
 
-// Sync Customers/Users
-function cwpai_sync_customers_users( $api_key, $facility_id ) {
-    // TODO: Add logic to sync customers/users with WebJoint API
+    return $output;
 }
-// Sync Products
-function cwpai_sync_products( $api_key, $facility_id ) {
-    // TODO: Add logic to sync products with WebJoint API
-}
-// Sync Orders
-function cwpai_sync_orders( $api_key, $facility_id ) {
-    // TODO: Add logic to sync orders with WebJoint API
-}
-// Sync Cart Information
-function cwpai_sync_cart_information( $api_key, $facility_id ) {
-    // TODO: Add logic to sync cart information with WebJoint API
-}
+add_shortcode( 'webjoint', 'cwpai_woojoint_shortcode' ); 
 
-// Add shortcode [webjoint]
-function cwpai_webjoint_shortcode( $atts ) {
-    $atts = shortcode_atts( array(
-        'type' => 'products',
-        'other_parameter' => ''
-    ), $atts );
-    
-    // TODO: Add logic to retrieve data from WebJoint API based on shortcode parameters
+// Setup sync cron schedule
+function cwpai_woojoint_sync_cron_interval( $schedules ) {
+    $schedules['woojoint_sync'] = array(
+        'interval' => 60,
+        'display' => 'Woojoint Data Sync',
+    );
+    return $schedules;
 }
-add_shortcode( 'webjoint', 'cwpai_webjoint_shortcode' );
+add_filter('cron_schedules', 'cwpai_woojoint_sync_cron_interval');
+
+?>
