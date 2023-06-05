@@ -25,7 +25,6 @@ same as for addToCart
 Example Request
 Delete cart item
 
-View More
 curl
 curl --location --request DELETE 'https://app.webjoint.xyz/test/api/carts/items/?preferRooms=false' \
 --header 'x-company-id: 21'
