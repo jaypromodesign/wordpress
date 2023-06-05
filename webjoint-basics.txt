@@ -1,0 +1,20 @@
+API URL​
+
+Production (live): https://app.webjoint.com/prod/api/
+Development (sandbox): https://app.webjoint.xyz/test/api/
+CAUTION
+
+facilityId is a required query parameter for most endpoints. It is best to include facilityId with every API request
+Authorization​
+
+You will be given a private API key, which you need to send in the x-api-key header. Please keep it safe.
+
+Authentication​
+
+Some endpoints perform actions which are done in the name of a user in the system. For example, the request to create a shop cart creates the cart for the logged in user. Since api integrators don't need to login and use API keys instead, you can use x-for-user-id header for this purpose. The value should be ID of the user for which you are sending the request. However, it should be obvious that you shouldn't store your API key in a client application, but only use it for server to server communication.
+
+If you are building an ecommerce frontend application, there is more information here
+
+Pagination​
+
+To paginate results in LIST endpoints, use the range query parameter. Range is defined as a tuple where the first element is the start record and the second element is the end record. For example &range=[0, 9] will give you first 10 results. &range=[10, 19] would give you the second 10. If you don't send the range parameter, you will get the first 20 elements. Maximum range is 100. The API returns the total number of records available in the content-range response header.

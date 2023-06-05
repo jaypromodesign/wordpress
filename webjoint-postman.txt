@@ -1,0 +1,136 @@
+Public
+ENVIRONMENT
+Webjoint Sandbox API ENV
+
+LAYOUT
+Double Column
+
+LANGUAGE
+cURL - cURL
+
+WEBJOINT API
+Introduction
+Basic
+Ecommerce Integration
+Webjoint API
+AUTHORIZATION
+API Key
+Key
+x-api-key
+Value
+gMsFqkAOAz6gV67nxaEH
+Basic
+AUTHORIZATION
+API Key
+This folder is using API Key from collectionWebjoint API
+GET
+Get Customer
+https://app.webjoint.xyz/test/api/customers/3
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+AUTHORIZATION
+API Key
+This request is using API Key from collectionWebjoint API
+HEADERS
+x-company-id
+21
+Example Request
+Get Customer
+
+curl
+curl --location 'https://app.webjoint.xyz/test/api/customers/3' \
+--header 'x-company-id: 21'
+Example Response
+Body
+Headers (0)
+No response body
+This request doesn't return any response body
+GET
+Orders
+https://app.webjoint.xyz/test/api/orders?facilityId=34
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+AUTHORIZATION
+API Key
+This request is using API Key from collectionWebjoint API
+HEADERS
+x-company-id
+21
+PARAMS
+facilityId
+34
+Example Request
+Orders
+
+curl
+curl --location 'https://app.webjoint.xyz/test/api/orders?facilityId=34' \
+--header 'x-company-id: 21'
+Example Response
+Body
+Headers (0)
+No response body
+This request doesn't return any response body
+GET
+Order by ID
+https://app.webjoint.xyz/test/api/orders/21-21-3-2891?x-company-id=21
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+AUTHORIZATION
+API Key
+This request is using API Key from collectionWebjoint API
+PARAMS
+x-company-id
+21
+Example Request
+Order by ID
+
+curl
+curl --location 'https://app.webjoint.xyz/test/api/orders/21-21-3-2891?x-company-id=21'
+Example Response
+Body
+Headers (0)
+No response body
+This request doesn't return any response body
+GET
+Facilities
+https://app.webjoint.xyz/test/api/facilities
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+AUTHORIZATION
+API Key
+This request is using API Key from collectionWebjoint API
+HEADERS
+x-company-id
+21
+Example Request
+Facilities
+
+curl
+curl --location 'https://app.webjoint.xyz/test/api/facilities' \
+--header 'x-company-id: 21'
+Example Response
+Body
+Headers (0)
+No response body
+This request doesn't return any response body
+GET
+Facility by ID
+https://app.webjoint.xyz/test/api/facilities/34
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+AUTHORIZATION
+API Key
+This request is using API Key from collectionWebjoint API
+HEADERS
+x-company-id
+21
+Example Request
+Facility by ID
+
+curl
+curl --location 'https://app.webjoint.xyz/test/api/facilities/34' \
+--header 'x-company-id: 21'
+Example Response
+Body
+Headers (0)
+No response body
+This request doesn't return any response body
+Ecommerce Integration
+AUTHORIZATION
+API Key
+This folder is using API Key from collectionWebjoint API
