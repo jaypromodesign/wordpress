@@ -1,17 +1,3 @@
-Public
-ENVIRONMENT
-Webjoint Sandbox API ENV
-
-LAYOUT
-Double Column
-
-LANGUAGE
-cURL - cURL
-
-WEBJOINT API
-Introduction
-Basic
-Ecommerce Integration
 Webjoint API
 AUTHORIZATION
 API Key
@@ -19,118 +5,172 @@ Key
 x-api-key
 Value
 gMsFqkAOAz6gV67nxaEH
-Basic
+DELETE
+Delete cart item
+https://app.webjoint.xyz/test/api/carts/items/?preferRooms=false
+This is used to remove an item from cart
+URL PARAMS:
+cartItem - This is the composite ID of the cart items to be removed - eg. "4-1-3034870-4-76884-85702". The composite ID is constructed like this: ${cartItem.companyId}-${cartItem.customerId}-${cartItem.cartId}-${cartItem.variantCompanyId}-${cartItem.productId}-${cartItem.variantId}
 AUTHORIZATION
 API Key
-This folder is using API Key from collectionWebjoint API
+This request is using API Key from collectionWebjoint API
+HEADERS
+x-company-id
+21
+PARAMS
+preferRooms
+false
+
+same as for addToCart
+Example Request
+Delete cart item
+
+View More
+curl
+curl --location --request DELETE 'https://app.webjoint.xyz/test/api/carts/items/?preferRooms=false' \
+--header 'x-company-id: 21'
+Example Response
+Body
+Headers (0)
+No response body
+This request doesn't return any response body
 GET
-Get Customer
+Cart
+https://app.webjoint.xyz/test/api/carts/
+This is used to remove an item from cart
+URL PARAMS:
+cartItem - This is the composite ID of the cart items to be removed - eg. "4-1-3034870-4-76884-85702". The composite ID is constructed like this: ${cartItem.companyId}-${cartItem.customerId}-${cartItem.cartId}-${cartItem.variantCompanyId}-${cartItem.productId}-${cartItem.variantId}
+AUTHORIZATION
+API Key
+This request is using API Key from collectionWebjoint API
+HEADERS
+x-company-id
+21
+x-for-user-id
+3
+Example Request
+Cart
+
+curl
+curl --location 'https://app.webjoint.xyz/test/api/carts/' \
+--header 'x-company-id: 21' \
+--header 'x-for-user-id: 3'
+Example Response
+Body
+Headers (0)
+No response body
+This request doesn't return any response body
+PUT
+Update Customer
 https://app.webjoint.xyz/test/api/customers/3
-This is used to fetch information about the customer, such as the amount of loyalty points that they have
+This is used to set the payment method of the cart. This is mandatory and if the cart is submitted without setting the payment method, submit will give an error "Please select payment type". An array should be sent in the body because we support split payments. If one payment type is used, then the array should have 1 element
+REQUEST BODY:
+[{"id":628,"amount":86.15}]
+* The "id" is the id of the payment method. You can get the list of available payment methods from GET /companies/theme ($response.facilities[i].paymentMethods)
+* amount is sent because we support split payments. In case of split payments, the request body should include each payment with the amount
 AUTHORIZATION
 API Key
 This request is using API Key from collectionWebjoint API
 HEADERS
 x-company-id
 21
+Body
+raw (json)
+View More
+json
+{
+    "verified": false,
+    "userType": "Medical",
+    "name": "Test Customer Edit",
+    "selfie": {
+        "key": "https://app.webjoint.xyz/uploads/User/60697/selfie/D100AE83600822E9B5DA3AD642600B0A"
+    },
+    "idcard": {
+        "image": {
+            "key": "https://app.webjoint.xyz/uploads/User/60697/selfie/D100AE83600822E9B5DA3AD642600B0A"
+        },
+        "number": "1234",
+        "expires": "2036-09-18T22:00:00.000Z"
+    },
+    "mmic": {
+        "image": {
+            "key": "https://app.webjoint.xyz/uploads/User/60697/selfie/D100AE83600822E9B5DA3AD642600B0A"
+        },
+        "number": "1234",
+        "expires": "2039-08-31T22:00:00.000Z"
+    },
+    "email": "amusetestcustomer@mailinator.com",
+    "phone": "+1231241155",
+    "birthday": "1925-09-02T23:00:00.000Z",
+    "address": {
+        "number": "2930",
+        "street": "Westwood Boulevard",
+        "neighborhood": "Palms",
+        "city": "Los Angeles",
+        "county": "Los Angeles",
+        "state": "CA",
+        "country": "US",
+        "zip": "90064",
+        "latLng": {
+            "lat": 34.031292,
+            "lng": -118.421308
+        },
+        "apartment": "apt 1"
+    },
+    "gender": "Male",
+    "notes": "test notes"
+}
 Example Request
-Get Customer
+Update Customer
 
+View More
 curl
-curl --location 'https://app.webjoint.xyz/test/api/customers/3' \
---header 'x-company-id: 21'
+curl --location --request PUT 'https://app.webjoint.xyz/test/api/customers/3' \
+--header 'x-company-id: 21' \
+--data-raw '{
+    "verified": false,
+    "userType": "Medical",
+    "name": "Test Customer Edit",
+    "selfie": {
+        "key": "https://app.webjoint.xyz/uploads/User/60697/selfie/D100AE83600822E9B5DA3AD642600B0A"
+    },
+    "idcard": {
+        "image": {
+            "key": "https://app.webjoint.xyz/uploads/User/60697/selfie/D100AE83600822E9B5DA3AD642600B0A"
+        },
+        "number": "1234",
+        "expires": "2036-09-18T22:00:00.000Z"
+    },
+    "mmic": {
+        "image": {
+            "key": "https://app.webjoint.xyz/uploads/User/60697/selfie/D100AE83600822E9B5DA3AD642600B0A"
+        },
+        "number": "1234",
+        "expires": "2039-08-31T22:00:00.000Z"
+    },
+    "email": "amusetestcustomer@mailinator.com",
+    "phone": "+1231241155",
+    "birthday": "1925-09-02T23:00:00.000Z",
+    "address": {
+        "number": "2930",
+        "street": "Westwood Boulevard",
+        "neighborhood": "Palms",
+        "city": "Los Angeles",
+        "county": "Los Angeles",
+        "state": "CA",
+        "country": "US",
+        "zip": "90064",
+        "latLng": {
+            "lat": 34.031292,
+            "lng": -118.421308
+        },
+        "apartment": "apt 1"
+    },
+    "gender": "Male",
+    "notes": "test notes"
+}'
 Example Response
 Body
 Headers (0)
 No response body
 This request doesn't return any response body
-GET
-Orders
-https://app.webjoint.xyz/test/api/orders?facilityId=34
-This is used to fetch information about the customer, such as the amount of loyalty points that they have
-AUTHORIZATION
-API Key
-This request is using API Key from collectionWebjoint API
-HEADERS
-x-company-id
-21
-PARAMS
-facilityId
-34
-Example Request
-Orders
-
-curl
-curl --location 'https://app.webjoint.xyz/test/api/orders?facilityId=34' \
---header 'x-company-id: 21'
-Example Response
-Body
-Headers (0)
-No response body
-This request doesn't return any response body
-GET
-Order by ID
-https://app.webjoint.xyz/test/api/orders/21-21-3-2891?x-company-id=21
-This is used to fetch information about the customer, such as the amount of loyalty points that they have
-AUTHORIZATION
-API Key
-This request is using API Key from collectionWebjoint API
-PARAMS
-x-company-id
-21
-Example Request
-Order by ID
-
-curl
-curl --location 'https://app.webjoint.xyz/test/api/orders/21-21-3-2891?x-company-id=21'
-Example Response
-Body
-Headers (0)
-No response body
-This request doesn't return any response body
-GET
-Facilities
-https://app.webjoint.xyz/test/api/facilities
-This is used to fetch information about the customer, such as the amount of loyalty points that they have
-AUTHORIZATION
-API Key
-This request is using API Key from collectionWebjoint API
-HEADERS
-x-company-id
-21
-Example Request
-Facilities
-
-curl
-curl --location 'https://app.webjoint.xyz/test/api/facilities' \
---header 'x-company-id: 21'
-Example Response
-Body
-Headers (0)
-No response body
-This request doesn't return any response body
-GET
-Facility by ID
-https://app.webjoint.xyz/test/api/facilities/34
-This is used to fetch information about the customer, such as the amount of loyalty points that they have
-AUTHORIZATION
-API Key
-This request is using API Key from collectionWebjoint API
-HEADERS
-x-company-id
-21
-Example Request
-Facility by ID
-
-curl
-curl --location 'https://app.webjoint.xyz/test/api/facilities/34' \
---header 'x-company-id: 21'
-Example Response
-Body
-Headers (0)
-No response body
-This request doesn't return any response body
-Ecommerce Integration
-AUTHORIZATION
-API Key
-This folder is using API Key from collectionWebjoint API
