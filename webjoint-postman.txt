@@ -20,3 +20,80 @@ x-company-id: 21
 
 Curl example: curl --location 'https://app.webjoint.xyz/test/api/customers/3' \
 --header 'x-company-id: 21'
+
+
+
+
+
+
+GET: Orders
+https://app.webjoint.xyz/test/api/orders?facilityId=34
+
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+
+AUTHORIZATION: API Key
+
+HEADERS
+x-company-id: 21
+
+PARAMS
+facilityId: 34
+
+Curl example: curl --location 'https://app.webjoint.xyz/test/api/orders/21-21-3-2891?x-company-id=21'
+
+
+
+
+
+
+
+GET: Order by ID
+https://app.webjoint.xyz/test/api/orders/21-21-3-2891?x-company-id=21
+
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+
+AUTHORIZATION: API Key
+
+PARAMS
+x-company-id: 21
+
+Curl example: curl --location 'https://app.webjoint.xyz/test/api/orders/21-21-3-2891?x-company-id=21'
+
+
+
+
+
+
+
+
+GET: Facilities
+https://app.webjoint.xyz/test/api/facilities
+
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+
+AUTHORIZATION: API Key
+
+HEADERS
+x-company-id: 21
+
+Curl example: curl --location 'https://app.webjoint.xyz/test/api/facilities' \
+--header 'x-company-id: 21'
+
+
+
+
+
+
+
+GET: Facility by ID
+https://app.webjoint.xyz/test/api/facilities/34
+
+This is used to fetch information about the customer, such as the amount of loyalty points that they have
+
+AUTHORIZATION: API Key
+
+HEADERS
+x-company-id: 21
+
+Curl example: curl --location 'https://app.webjoint.xyz/test/api/facilities/34' \
+--header 'x-company-id: 21'
